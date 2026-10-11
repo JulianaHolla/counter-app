@@ -1,12 +1,34 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { SavedCounter } from '../models/saved-counter';
+import { CounterService } from '../services/counter.service';
 import { Tab1Page } from './tab1.page';
 
 describe('Tab1Page', () => {
   let component: Tab1Page;
   let fixture: ComponentFixture<Tab1Page>;
+  const addMock = vi.fn().mockResolvedValue(undefined);
 
-  beforeEach(() => {
+  const counter: SavedCounter = {
+    id: 'x',
+    name: 'Test',
+    value: 3,
+    createdAt: '2026-09-17T08:00:00.000Z',
+  };
+
+  beforeEach(async () => {
+    addMock.mockClear();
+
+    await TestBed.configureTestingModule({
+      imports: [Tab1Page],
+      providers: [
+        {
+          provide: CounterService,
+          useValue: { add: addMock, initialize: vi.fn() },
+        },
+      ],
+    }).compileComponents();
+
     fixture = TestBed.createComponent(Tab1Page);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -16,31 +38,17 @@ describe('Tab1Page', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should increment the counter', () => {
-    component.increment();
+  it('should pass saved counter to CounterService', async () => {
+    await component.onSaved(counter);
 
-    expect(component.count).toBe(1);
+    expect(addMock).toHaveBeenCalledWith(counter);
   });
 
-  it('should decrement but never go below zero', () => {
-    component.decrement();
-    expect(component.count).toBe(0);
+  it('should show a toast after saving', async () => {
+    expect(component.toastOpen()).toBe(false);
 
-    component.count = 2;
-    component.decrement();
-    expect(component.count).toBe(1);
-  });
+    await component.onSaved(counter);
 
-  it('should reset the counter and update the template', () => {
-    component.count = 5;
-    component.reset();
-    fixture.detectChanges();
-
-    const value = fixture.nativeElement.querySelector(
-      '.counter-value',
-    ) as HTMLElement;
-
-    expect(component.count).toBe(0);
-    expect(value.textContent?.trim()).toBe('0');
+    expect(component.toastOpen()).toBe(true);
   });
 });
