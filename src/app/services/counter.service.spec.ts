@@ -103,15 +103,38 @@ describe('CounterService', () => {
     expect(removeMock).toHaveBeenCalledWith({ key: 'saved-counters' });
   });
 
-  it('should handle corrupted saved value', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getMock.mockResolvedValue({ value: '{neplatny json' });
+  it('should recover from invalid JSON', async () => {
+    getMock.mockResolvedValue({ value: 'this is not a valid JSON' });
+    const errorSpy = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => undefined);
 
-    await expect(service.initialize()).resolves.toBeUndefined();
+    await service.initialize();
 
     expect(service.counters()).toEqual([]);
     expect(service.initialized()).toBe(true);
-    expect(errorSpy).toHaveBeenCalled();
+    expect(errorSpy).toHaveBeenCalledWith(
+      'Historii počítadel se nepodařilo načíst.',
+      expect.any(Error),
+    );
+
+    errorSpy.mockRestore();
+  });
+
+  it('should recover from valid JSON of the wrong shape', async () => {
+    getMock.mockResolvedValue({ value: JSON.stringify({ name: 'test' }) });
+    const errorSpy = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => undefined);
+
+    await service.initialize();
+
+    expect(service.counters()).toEqual([]);
+    expect(service.initialized()).toBe(true);
+    expect(errorSpy).toHaveBeenCalledWith(
+      'Historii počítadel se nepodařilo načíst.',
+      expect.any(Error),
+    );
 
     errorSpy.mockRestore();
   });

@@ -9,6 +9,13 @@ describe('Tab1Page', () => {
   let fixture: ComponentFixture<Tab1Page>;
   const addMock = vi.fn().mockResolvedValue(undefined);
 
+  const counter: SavedCounter = {
+    id: 'x',
+    name: 'Test',
+    value: 3,
+    createdAt: '2026-09-17T08:00:00.000Z',
+  };
+
   beforeEach(async () => {
     addMock.mockClear();
 
@@ -32,15 +39,16 @@ describe('Tab1Page', () => {
   });
 
   it('should pass saved counter to CounterService', async () => {
-    const counter: SavedCounter = {
-      id: 'x',
-      name: 'Test',
-      value: 3,
-      createdAt: '2026-09-17T08:00:00.000Z',
-    };
-
     await component.onSaved(counter);
 
     expect(addMock).toHaveBeenCalledWith(counter);
+  });
+
+  it('should show a toast after saving', async () => {
+    expect(component.toastOpen()).toBe(false);
+
+    await component.onSaved(counter);
+
+    expect(component.toastOpen()).toBe(true);
   });
 });
