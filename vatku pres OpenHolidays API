@@ -1,0 +1,291 @@
+[1mdiff --git a/src/app/tab3/tab3.page.html b/src/app/tab3/tab3.page.html[m
+[1mindex a810c0e..3a9da27 100644[m
+[1m--- a/src/app/tab3/tab3.page.html[m
+[1m+++ b/src/app/tab3/tab3.page.html[m
+[36m@@ -1,5 +1,76 @@[m
+[31m-<div class="ion-padding">[m
+[31m-  <h2>O aplikaci</h2>[m
+[31m-  <p>Autor: Juliana Holla</p>[m
+[31m-  <p>AP5PM 2026</p>[m
+[31m-</div>[m
+\ No newline at end of file[m
+[32m+[m[32m<ion-header [translucent]="true">[m
+[32m+[m[32m  <ion-toolbar>[m
+[32m+[m[32m    <ion-title>Odpočet do svátku</ion-title>[m
+[32m+[m[32m  </ion-toolbar>[m
+[32m+[m[32m</ion-header>[m
+[32m+[m
+[32m+[m[32m<ion-content [fullscreen]="true" class="ion-padding">[m
+[32m+[m[32m  <div class="page-content">[m
+[32m+[m[32m    <section aria-labelledby="holidays-heading" [attr.aria-busy]="loading()">[m
+[32m+[m[32m      <h2 id="holidays-heading">Kolik dnů zbývá do…</h2>[m
+[32m+[m[32m      <p>Vyberte český svátek a zobrazte počet zbývajících kalendářních dnů.</p>[m
+[32m+[m
+[32m+[m[32m      <ion-button [disabled]="loading()" (click)="loadHolidays()">[m
+[32m+[m[32m        {{ loading() ? 'Načítám…' : 'Načíst znovu' }}[m
+[32m+[m[32m      </ion-button>[m
+[32m+[m
+[32m+[m[32m      @if (loading()) {[m
+[32m+[m[32m        <div class="state-message" role="status">[m
+[32m+[m[32m          <ion-spinner aria-hidden="true"></ion-spinner>[m
+[32m+[m[32m          <p>Načítám svátky…</p>[m
+[32m+[m[32m        </div>[m
+[32m+[m[32m      } @else if (errorMessage()) {[m
+[32m+[m[32m        <p class="state-message error-message" role="alert">{{ errorMessage() }}</p>[m
+[32m+[m[32m      } @else if (holidays().length === 0) {[m
+[32m+[m[32m        <p class="state-message">Pro vybrané období nejsou žádné nadcházející svátky.</p>[m
+[32m+[m[32m      } @else {[m
+[32m+[m[32m        <ion-select[m
+[32m+[m[32m          label="Vyberte svátek"[m
+[32m+[m[32m          label-placement="stacked"[m
+[32m+[m[32m          interface="alert"[m
+[32m+[m[32m          cancel-text="Zrušit"[m
+[32m+[m[32m          ok-text="Vybrat"[m
+[32m+[m[32m          [value]="selectedId()"[m
+[32m+[m[32m          (ionChange)="selectedId.set($event.detail.value)"[m
+[32m+[m[32m        >[m
+[32m+[m[32m          @for (holiday of holidays(); track holiday.id) {[m
+[32m+[m[32m            <ion-select-option [value]="holiday.id">[m
+[32m+[m[32m              {{ holiday.startDate | date: 'd. M. y' }} – {{ holidayName(holiday) }}[m
+[32m+[m[32m            </ion-select-option>[m
+[32m+[m[32m          }[m
+[32m+[m[32m        </ion-select>[m
+[32m+[m
+[32m+[m[32m        @if (selectedHoliday(); as holiday) {[m
+[32m+[m[32m          <ion-card>[m
+[32m+[m[32m            <ion-card-header>[m
+[32m+[m[32m              <ion-card-title>{{ holidayName(holiday) }}</ion-card-title>[m
+[32m+[m[32m            </ion-card-header>[m
+[32m+[m[32m            <ion-card-content>[m
+[32m+[m[32m              <p>{{ holiday.startDate | date: 'd. M. y' }}</p>[m
+[32m+[m[32m              <div aria-live="polite">[m
+[32m+[m[32m                <p class="countdown-value">{{ remainingDays() }}</p>[m
+[32m+[m[32m                @if (remainingDays() === 0) {[m
+[32m+[m[32m                  <p>Svátek je dnes!</p>[m
+[32m+[m[32m                } @else {[m
+[32m+[m[32m                  <p>Počet dnů do svátku</p>[m
+[32m+[m[32m                }[m
+[32m+[m[32m              </div>[m
+[32m+[m[32m              <p>Počítáno k {{ today() | date: 'd. M. y' }}.</p>[m
+[32m+[m[32m            </ion-card-content>[m
+[32m+[m[32m          </ion-card>[m
+[32m+[m[32m        }[m
+[32m+[m[32m      }[m
+[32m+[m[32m    </section>[m
+[32m+[m
+[32m+[m[32m    <section>[m
+[32m+[m[32m      <h2>O aplikaci c:</h2>[m
+[32m+[m[32m      <p>Autor: Juliana Hollá</p>[m
+[32m+[m[32m      <p>AP5PM 2026 – CounterApp</p>[m
+[32m+[m[32m      <p>[m
+[32m+[m[32m        Zdroj dat:[m
+[32m+[m[32m        <a href="https://www.openholidaysapi.org/en/">OpenHolidays API</a>[m
+[32m+[m[32m        (<a href="https://www.openholidaysapi.org/en/faq/">licence ODbL</a>).[m
+[32m+[m[32m      </p>[m
+[32m+[m[32m    </section>[m
+[32m+[m[32m  </div>[m
+[32m+[m[32m</ion-content>[m
+\ No newline at end of file[m
+[1mdiff --git a/src/app/tab3/tab3.page.scss b/src/app/tab3/tab3.page.scss[m
+[1mindex e69de29..f8d0d86 100644[m
+[1m--- a/src/app/tab3/tab3.page.scss[m
+[1m+++ b/src/app/tab3/tab3.page.scss[m
+[36m@@ -0,0 +1,39 @@[m
+[32m+[m[32m.page-content {[m
+[32m+[m[32m  max-width: 40rem;[m
+[32m+[m[32m  margin: 1rem auto;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32msection + section {[m
+[32m+[m[32m  margin-top: 2rem;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mion-select {[m
+[32m+[m[32m  margin-top: 1rem;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mion-card {[m
+[32m+[m[32m  margin: 1rem 0;[m
+[32m+[m[32m  text-align: center;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mion-card-title {[m
+[32m+[m[32m  font-size: 1.25rem;[m
+[32m+[m[32m  overflow-wrap: anywhere;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32m.countdown-value {[m
+[32m+[m[32m  margin: 1.5rem 0;[m
+[32m+[m[32m  font-size: 4rem;[m
+[32m+[m[32m  font-weight: 700;[m
+[32m+[m[32m  line-height: 1;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32m.state-message {[m
+[32m+[m[32m  margin: 2rem 0;[m
+[32m+[m[32m  color: var(--ion-color-medium);[m
+[32m+[m[32m  text-align: center;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32m.error-message {[m
+[32m+[m[32m  color: var(--ion-color-danger);[m
+[32m+[m[32m}[m
+\ No newline at end of file[m
+[1mdiff --git a/src/app/tab3/tab3.page.ts b/src/app/tab3/tab3.page.ts[m
+[1mindex e6d434b..8d0ef5d 100644[m
+[1m--- a/src/app/tab3/tab3.page.ts[m
+[1m+++ b/src/app/tab3/tab3.page.ts[m
+[36m@@ -1,13 +1,115 @@[m
+[31m-import { Component } from '@angular/core';[m
+[31m-import { IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/angular';[m
+[31m-import { ExploreContainerComponent } from '../explore-container/explore-container.component';[m
+[32m+[m[32mimport { Component, computed, inject, signal } from '@angular/core';[m
+[32m+[m[32mimport { DatePipe } from '@angular/common';[m
+[32m+[m[32mimport {[m
+[32m+[m[32m  IonButton,[m
+[32m+[m[32m  IonCard,[m
+[32m+[m[32m  IonCardContent,[m
+[32m+[m[32m  IonCardHeader,[m
+[32m+[m[32m  IonCardTitle,[m
+[32m+[m[32m  IonContent,[m
+[32m+[m[32m  IonHeader,[m
+[32m+[m[32m  IonSelect,[m
+[32m+[m[32m  IonSelectOption,[m
+[32m+[m[32m  IonSpinner,[m
+[32m+[m[32m  IonTitle,[m
+[32m+[m[32m  IonToolbar,[m
+[32m+[m[32m} from '@ionic/angular';[m
+[32m+[m[32mimport { PublicHoliday } from '../models/public-holiday';[m
+[32m+[m[32mimport { daysUntil, localDateIso } from '../models/holiday-date';[m
+[32m+[m[32mimport { HolidayApiService } from '../services/holiday-api.service';[m
+ [m
+ @Component({[m
+   selector: 'app-tab3',[m
+   templateUrl: 'tab3.page.html',[m
+   styleUrls: ['tab3.page.scss'],[m
+[31m-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, ExploreContainerComponent],[m
+[32m+[m[32m  imports: [[m
+[32m+[m[32m    DatePipe,[m
+[32m+[m[32m    IonButton,[m
+[32m+[m[32m    IonCard,[m
+[32m+[m[32m    IonCardContent,[m
+[32m+[m[32m    IonCardHeader,[m
+[32m+[m[32m    IonCardTitle,[m
+[32m+[m[32m    IonContent,[m
+[32m+[m[32m    IonHeader,[m
+[32m+[m[32m    IonSelect,[m
+[32m+[m[32m    IonSelectOption,[m
+[32m+[m[32m    IonSpinner,[m
+[32m+[m[32m    IonTitle,[m
+[32m+[m[32m    IonToolbar,[m
+[32m+[m[32m  ],[m
+ })[m
+ export class Tab3Page {[m
+[31m-  constructor() {}[m
+[31m-}[m
+[32m+[m[32m  private readonly holidayApi = inject(HolidayApiService);[m
+[32m+[m
+[32m+[m[32m  readonly holidays = signal<PublicHoliday[]>([]);[m
+[32m+[m[32m  readonly selectedId = signal('');[m
+[32m+[m[32m  readonly today = signal(localDateIso());[m
+[32m+[m[32m  readonly loading = signal(false);[m
+[32m+[m[32m  readonly errorMessage = signal('');[m
+[32m+[m
+[32m+[m[32m  // Při změně seznamu nebo vybraného ID znovu najdeme odpovídající svátek.[m
+[32m+[m[32m  readonly selectedHoliday = computed(() =>[m
+[32m+[m[32m    this.holidays().find((holiday) => holiday.id === this.selectedId()),[m
+[32m+[m[32m  );[m
+[32m+[m
+[32m+[m[32m  // Změna svátku nebo dneška přepočítá odpočet bez nového volání API.[m
+[32m+[m[32m  readonly remainingDays = computed(() => {[m
+[32m+[m[32m    const holiday = this.selectedHoliday();[m
+[32m+[m[32m    // Dokud není vybraný svátek, nemáme z čeho počítat.[m
+[32m+[m[32m    if (!holiday) {[m
+[32m+[m[32m      return null;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    return daysUntil(holiday.startDate, this.today());[m
+[32m+[m[32m  });[m
+[32m+[m
+[32m+[m[32m  // Ionic tuto metodu zavolá při každém vstupu na záložku.[m
+[32m+[m[32m  async ionViewWillEnter(): Promise<void> {[m
+[32m+[m[32m    await this.loadHolidays();[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  holidayName(holiday: PublicHoliday): string {[m
+[32m+[m[32m    // API jsme požádali o češtinu; vezmeme první název.[m
+[32m+[m[32m    // ?. ošetří chybějící položku a ?? doplní náhradní text, pokud text chybí.[m
+[32m+[m[32m    return holiday.name[0]?.text ?? 'Svátek bez názvu';[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  async loadHolidays(): Promise<void> {[m
+[32m+[m[32m    // Pokud už požadavek běží, další nespouštíme.[m
+[32m+[m[32m    if (this.loading()) {[m
+[32m+[m[32m      return;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    // Dnešek obnovíme i při návratu na stránku, například po půlnoci.[m
+[32m+[m[32m    const now = new Date();[m
+[32m+[m[32m    const today = localDateIso(now);[m
+[32m+[m[32m    const nextYear = now.getFullYear() + 1;[m
+[32m+[m[32m    this.today.set(today);[m
+[32m+[m[32m    // Zapneme spinner a vymažeme předchozí chybu, data i výběr.[m
+[32m+[m[32m    this.loading.set(true);[m
+[32m+[m[32m    this.errorMessage.set('');[m
+[32m+[m[32m    this.holidays.set([]);[m
+[32m+[m[32m    this.selectedId.set('');[m
+[32m+[m
+[32m+[m[32m    try {[m
+[32m+[m[32m      // Načteme i příští rok, aby byl co vybírat také na konci prosince.[m
+[32m+[m[32m      const holidays = await this.holidayApi.getHolidays(today, `${nextYear}-12-31`);[m
+[32m+[m[32m      // filter ponechá dnešní a budoucí svátky; datum porovnáváme jako řetězec.[m
+[32m+[m[32m      const upcoming = holidays.filter((holiday) => holiday.startDate >= today);[m
+[32m+[m[32m      this.holidays.set(upcoming);[m
+[32m+[m[32m      // Služba svátky seřadila. První vybereme, jen pokud pole není prázdné.[m
+[32m+[m[32m      const firstHoliday = upcoming[0];[m
+[32m+[m[32m      if (firstHoliday) {[m
+[32m+[m[32m        this.selectedId.set(firstHoliday.id);[m
+[32m+[m[32m      }[m
+[32m+[m[32m    } catch (error) {[m
+[32m+[m[32m      // Podrobnosti patří do konzole, uživateli zobrazíme krátkou zprávu.[m
+[32m+[m[32m      console.error('Svátky se nepodařilo načíst.', error);[m
+[32m+[m
+[32m+[m[32m      this.errorMessage.set('Svátky se nepodařilo načíst. Zkuste to znovu.');[m
+[32m+[m[32m    } finally {[m
+[32m+[m[32m      // finally se provede po úspěchu i po chybě: vypne spinner a povolí tlačítko.[m
+[32m+[m[32m      this.loading.set(false);[m
+[32m+[m[32m    }[m
+[32m+[m[32m  }[m
+[32m+[m[32m}[m
+\ No newline at end of file[m
+[1mdiff --git a/src/main.ts b/src/main.ts[m
+[1mindex b5f19e1..7112bf2 100644[m
+[1m--- a/src/main.ts[m
+[1m+++ b/src/main.ts[m
+[36m@@ -1,14 +1,22 @@[m
+ import { bootstrapApplication } from '@angular/platform-browser';[m
+[31m-import { RouteReuseStrategy, provideRouter, withComponentInputBinding, withPreloading, PreloadAllModules } from '@angular/router';[m
+[32m+[m[32mimport { provideHttpClient } from '@angular/common/http';[m
+[32m+[m[32mimport {[m
+[32m+[m[32m  PreloadAllModules,[m
+[32m+[m[32m  RouteReuseStrategy,[m
+[32m+[m[32m  provideRouter,[m
+[32m+[m[32m  withComponentInputBinding,[m
+[32m+[m[32m  withPreloading,[m
+[32m+[m[32m} from '@angular/router';[m
+ import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular';[m
+ [m
+[31m-import { routes } from './app/app.routes';[m
+ import { AppComponent } from './app/app.component';[m
+[32m+[m[32mimport { routes } from './app/app.routes';[m
+ [m
+ bootstrapApplication(AppComponent, {[m
+   providers: [[m
+     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },[m
+     provideIonicAngular(),[m
+[32m+[m[32m    provideHttpClient(),[m
+     provideRouter(routes, withPreloading(PreloadAllModules), withComponentInputBinding()),[m
+   ],[m
+[31m-});[m
+[32m+[m[32m});[m
+\ No newline at end of file[m
